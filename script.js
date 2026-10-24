@@ -77,6 +77,62 @@
   let currentCase = null, selected = null, hintCount = 0, answered = false;
   let activeFilter = "all", correctCount = 0, completed = new Set(), currentSequence = cases.slice();
 
+  // タブレットの指・タッチペンで使える手書きメモ
+  const scratchCanvas = $("scratchpadCanvas");
+  const scratchContext = scratchCanvas.getContext("2d");
+  let scratchDrawing = false;
+  function sizeScratchpad() {
+    const rect = scratchCanvas.getBoundingClientRect();
+    const ratio = window.devicePixelRatio || 1;
+    const previous = document.createElement("canvas");
+    previous.width = scratchCanvas.width;
+    previous.height = scratchCanvas.height;
+    if (previous.width && previous.height) previous.getContext("2d").drawImage(scratchCanvas, 0, 0);
+    scratchCanvas.width = Math.max(1, Math.round(rect.width * ratio));
+    scratchCanvas.height = Math.max(1, Math.round(rect.height * ratio));
+    scratchContext.setTransform(ratio, 0, 0, ratio, 0, 0);
+    scratchContext.lineWidth = 2.5;
+    scratchContext.lineCap = "round";
+    scratchContext.lineJoin = "round";
+    scratchContext.strokeStyle = "#24334b";
+    if (previous.width && previous.height) {
+      scratchContext.drawImage(previous, 0, 0, previous.width, previous.height, 0, 0, rect.width, rect.height);
+    }
+  }
+  function clearScratchpad() {
+    const rect = scratchCanvas.getBoundingClientRect();
+    scratchContext.clearRect(0, 0, rect.width, rect.height);
+  }
+  function scratchPoint(event) {
+    const rect = scratchCanvas.getBoundingClientRect();
+    return { x: event.clientX - rect.left, y: event.clientY - rect.top };
+  }
+  scratchCanvas.addEventListener("pointerdown", event => {
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+    scratchDrawing = true;
+    scratchCanvas.setPointerCapture(event.pointerId);
+    const point = scratchPoint(event);
+    scratchContext.beginPath();
+    scratchContext.moveTo(point.x, point.y);
+    scratchContext.lineTo(point.x + 0.1, point.y + 0.1);
+    scratchContext.stroke();
+    event.preventDefault();
+  });
+  scratchCanvas.addEventListener("pointermove", event => {
+    if (!scratchDrawing) return;
+    const point = scratchPoint(event);
+    scratchContext.lineTo(point.x, point.y);
+    scratchContext.stroke();
+    event.preventDefault();
+  });
+  function stopScratchDrawing() { scratchDrawing = false; scratchContext.closePath(); }
+  scratchCanvas.addEventListener("pointerup", stopScratchDrawing);
+  scratchCanvas.addEventListener("pointercancel", stopScratchDrawing);
+  scratchCanvas.addEventListener("lostpointercapture", stopScratchDrawing);
+  $("clearScratchpad").addEventListener("click", clearScratchpad);
+  window.addEventListener("resize", sizeScratchpad);
+  sizeScratchpad();
+
   function statementIsTrue(statement, culprit, item) {
     if (statement.kind === "culprit") return statement.target === culprit;
     if (statement.kind === "notCulprit") return statement.target !== culprit;
@@ -134,6 +190,7 @@
   }
   function openCase(item) {
     currentCase = item; selected = null; hintCount = 0; answered = false;
+    clearScratchpad();
     $("puzzleLevel").textContent = "LEVEL " + item.level + " · " + (item.level === 1 ? "OBSERVATION" : item.level === 2 ? "CONNECTION" : "DEDUCTION");
     setReadingText($("puzzleTitle"), item.title);
     setReadingText($("puzzleIntro"), item.intro);
