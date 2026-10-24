@@ -16,6 +16,38 @@
     {id:10,level:3,title:"最後の見きわめ",intro:"最後は6人。自分自身についての発言にも注目して、すべての証言が成り立つか確かめよう。",hint:"Dさんがうそつきだとすると、Dさんの「Dは正直者」はどうなる？",explanation:"Dさんがうそつきなら、Dさんの「Dは正直者」はうそ。ほかの5人の発言は、Dさん以外について正直者だと言っているので、すべて本当になるよ。だから、うそつきはDさん一人だけ。",statements:[{speaker:"A",claim:"truth",target:"C"},{speaker:"B",claim:"truth",target:"E"},{speaker:"C",claim:"truth",target:"E"},{speaker:"D",claim:"truth",target:"D"},{speaker:"E",claim:"truth",target:"F"},{speaker:"F",claim:"truth",target:"F"}]}
   ];
 
+  // 小学生が読みやすいよう、よく使う漢字にふりがなを付ける
+  const readings = {
+    "読み比べ":"よみくらべ","正直者":"しょうじきもの","発言":"はつげん","矛盾":"むじゅん",
+    "証言":"しょうげん","条件":"じょうけん","確認":"かくにん","自分自身":"じぶんじしん",
+    "自分":"じぶん","発言内容":"はつげんないよう","内容":"ないよう","本当":"ほんとう",
+    "一人":"ひとり","一つずつ":"ひとつずつ","一人ずつ":"ひとりずつ","必ず":"かならず",
+    "全員":"ぜんいん","正解":"せいかい","解説":"かいせつ","考え方":"かんがえかた",
+    "発言どうし":"はつげんどうし","食いちがう":"くいちがう","仮定":"かてい",
+    "候補":"こうほ","最後":"さいご","推理":"すいり","挑戦":"ちょうせん",
+    "見抜":"みぬ","信じ":"しん","考":"かんが","確":"たし","話":"はな","人":"ひと",
+    "発言":"はつげん","正直":"しょうじき","嘘":"うそ","うそつき":"うそつき",
+    "証言":"しょうげん","最後":"さいご","自分":"じぶん","本当":"ほんとう"
+  };
+  const readingEntries = Object.entries(readings).sort((a,b)=>b[0].length-a[0].length);
+  function setReadingText(element, value) {
+    element.replaceChildren();
+    const text = String(value ?? "");
+    const pattern = new RegExp(readingEntries.map(([word])=>word.replace(/[.*+?^${}()|[\]\\]/g,"\\  const $ = id => document.getElementById(id);")).join("|"),"g");
+    let cursor = 0, match;
+    while ((match = pattern.exec(text)) !== null) {
+      if (match.index > cursor) element.append(document.createTextNode(text.slice(cursor,match.index)));
+      const ruby = document.createElement("ruby");
+      ruby.append(document.createTextNode(match[0]));
+      const rt = document.createElement("rt");
+      rt.textContent = readings[match[0]];
+      ruby.append(rt);
+      element.append(ruby);
+      cursor = match.index + match[0].length;
+    }
+    if (cursor < text.length) element.append(document.createTextNode(text.slice(cursor)));
+  }
+
   const $ = id => document.getElementById(id);
   const views = {home:$("homeView"), puzzle:$("puzzleView"), result:$("resultView")};
   let currentCase = null, selected = null, hintCount = 0, answered = false;
@@ -57,7 +89,7 @@
       const number = document.createElement("span"); number.className = "card-number"; number.textContent = "CASE " + String(item.id).padStart(2,"0");
       const level = document.createElement("span"); level.className = "level-pill level-" + item.level; level.textContent = "LEVEL " + item.level;
       top.append(number, level);
-      const title = document.createElement("h3"); title.className = "card-title"; title.textContent = item.title;
+      const title = document.createElement("h3"); title.className = "card-title"; setReadingText(title, item.title);
       const meta = document.createElement("div"); meta.className = "card-meta";
       const detail = document.createElement("span"); detail.textContent = item.statements.length + "人の証言";
       const arrow = document.createElement("span"); arrow.className = "card-arrow"; arrow.textContent = completed.has(item.id) ? "✓" : "↗";
@@ -75,8 +107,8 @@
   function openCase(item) {
     currentCase = item; selected = null; hintCount = 0; answered = false;
     $("puzzleLevel").textContent = "LEVEL " + item.level + " · " + (item.level === 1 ? "OBSERVATION" : item.level === 2 ? "CONNECTION" : "DEDUCTION");
-    $("puzzleTitle").textContent = item.title;
-    $("puzzleIntro").textContent = item.intro;
+    setReadingText($("puzzleTitle"), item.title);
+    setReadingText($("puzzleIntro"), item.intro);
     $("caseNumber").textContent = String(item.id).padStart(2,"0");
     $("progressLabel").textContent = "CASE " + String(item.id).padStart(2,"0") + " / " + String(cases.length).padStart(2,"0");
     $("progressBar").style.width = (item.id / cases.length * 100) + "%";
@@ -88,7 +120,7 @@
       const copy = document.createElement("div");
       const name = document.createElement("p"); name.className = "statement-name"; name.textContent = statement.speaker + "さんの発言";
       const text = document.createElement("p"); text.className = "statement-text";
-      text.textContent = "「" + statement.target + "さんは" + (statement.claim === "liar" ? "うそつき" : "正直者") + "だ。」";
+      setReadingText(text, "「" + statement.target + "さんは" + (statement.claim === "liar" ? "うそつき" : "正直者") + "だ。」");
       copy.append(name, text); card.append(mark, copy); $("statementList").append(card);
       const option = document.createElement("button"); option.type = "button"; option.className = "answer-option"; option.dataset.person = statement.speaker;
       const letter = document.createElement("span"); letter.className = "option-letter"; letter.textContent = statement.speaker;
@@ -112,7 +144,7 @@
     hintCount++;
     const box = $("hintBox"); box.classList.remove("hidden"); box.replaceChildren();
     const title = document.createElement("strong"); title.textContent = "ヒント " + hintCount;
-    const text = document.createElement("p"); text.textContent = hintCount === 1 ? currentCase.hint : "一人ずつ「この人がうそつき」と仮定しよう。その人の発言だけがうそになり、ほかの全員の発言が本当になるかな？";
+    const text = document.createElement("p"); setReadingText(text, hintCount === 1 ? currentCase.hint : "一人ずつ「この人がうそつき」と仮定しよう。その人の発言だけがうそになり、ほかの全員の発言が本当になるかな？");
     box.append(title, text);
     if (hintCount >= 2) $("hintButton").disabled = true;
   }
@@ -129,8 +161,8 @@
     const feedback = $("feedback"); feedback.className = "feedback " + (correct ? "correct" : "incorrect"); feedback.classList.remove("hidden");
     feedback.textContent = correct ? "正解！ 矛盾を見抜いたね。" : "今回はちがったね。考え方を解説で確かめよう。";
     const explanation = $("explanationBox"); explanation.classList.remove("hidden");
-    const heading = document.createElement("h3"); heading.textContent = "答え：" + answer[0] + "さん";
-    const text = document.createElement("p"); text.textContent = currentCase.explanation;
+    const heading = document.createElement("h3"); setReadingText(heading, "答え：" + answer[0] + "さん");
+    const text = document.createElement("p"); setReadingText(text, currentCase.explanation);
     explanation.append(heading, text);
     document.querySelectorAll(".answer-option").forEach(button => {
       button.disabled = true;
@@ -153,7 +185,7 @@
     $("resultScore").textContent = correctCount + " / " + completed.size;
     const percent = completed.size ? Math.round(correctCount / completed.size * 100) : 0;
     $("resultBar").style.width = percent + "%";
-    $("resultMessage").textContent = completed.size === cases.length ? "全10問に挑戦！ 発言を比べて考えたことが力になるよ。" : completed.size + "問に挑戦したね。続きの問題も解いてみよう。";
+    setReadingText($("resultMessage"), completed.size === cases.length ? "全10問に挑戦！ 発言を比べて考えたことが力になるよ。" : completed.size + "問に挑戦したね。続きの問題も解いてみよう。");
     showView("result");
   }
   $("startButton").addEventListener("click", () => { const next = cases.find(item => !completed.has(item.id)); openCase(next || cases[0]); });
