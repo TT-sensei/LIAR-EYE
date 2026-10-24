@@ -2,11 +2,11 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#172238">
   <meta name="description" content="発言を読み比べて、嘘つきを見破ろう。考える力を育てる論理パズル、ライアーアイ。">
   <title>LIAR EYE｜ライアーアイ</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css">\n  <link rel="stylesheet" href="monochrome.css">
 </head>
 <body>
   <div class="app-shell">
@@ -27,7 +27,7 @@
           <div class="hero-copy">
             <p class="eyebrow">THINK. CHECK. SOLVE.</p>
             <h1>その発言、<br><span>本当か。</span></h1>
-            <p class="hero-description">みんなの発言を読み比べて、たったひとりの嘘つきを見破ろう。</p>
+            <p class="hero-description">みんなの<ruby>発言<rt>はつげん</rt></ruby>を<ruby>読み比<rt>よみくら</rt></ruby>べて、たったひとりの<ruby>嘘<rt>うそ</rt></ruby>つきを<ruby>見破<rt>みやぶ</rt></ruby>ろう。</p>
             <button id="startButton" class="primary-button" type="button">チャレンジをはじめる <span aria-hidden="true">→</span></button>
           </div>
           <div class="hero-art" aria-hidden="true">
@@ -39,13 +39,13 @@
         </div>
 
         <section class="mission-strip" aria-label="遊び方">
-          <div class="mission-number">01</div><div><strong>発言を読む</strong><p>ひとりずつ、ていねいに。</p></div>
-          <div class="mission-number">02</div><div><strong>矛盾を探す</strong><p>発言をくらべて考えよう。</p></div>
-          <div class="mission-number">03</div><div><strong>嘘つきを選ぶ</strong><p>理由まで説明できたら完ぺき。</p></div>
+          <div class="mission-number">01</div><div><strong><ruby>発言<rt>はつげん</rt></ruby>を<ruby>読<rt>よ</rt></ruby>む</strong><p>ひとりずつ、ていねいに。</p></div>
+          <div class="mission-number">02</div><div><strong><ruby>矛盾<rt>むじゅん</rt></ruby>を<ruby>探<rt>さが</rt></ruby>す</strong><p><ruby>発言<rt>はつげん</rt></ruby>をくらべて<ruby>考<rt>かんが</rt></ruby>えよう。</p></div>
+          <div class="mission-number">03</div><div><strong><ruby>嘘<rt>うそ</rt></ruby>つきを<ruby>選<rt>えら</rt></ruby>ぶ</strong><p><ruby>理由<rt>りゆう</rt></ruby>まで<ruby>説明<rt>せつめい</rt></ruby>できたら<ruby>完<rt>かん</rt></ruby>ぺき。</p></div>
         </section>
 
         <section class="challenge-section">
-          <div class="section-heading"><div><p class="eyebrow">YOUR CASE FILES</p><h2>チャレンジ一覧</h2></div><p class="section-note">やさしい問題から挑戦しよう。</p></div>
+          <div class="section-heading"><div><p class="eyebrow">YOUR CASE FILES</p><h2>チャレンジ<ruby>一覧<rt>いちらん</rt></ruby></h2></div><p class="section-note">やさしい問題から挑戦しよう。</p></div>
           <div id="levelFilters" class="filter-row" aria-label="難易度でしぼりこみ">
             <button class="filter-chip active" data-filter="all" type="button">すべて</button>
             <button class="filter-chip" data-filter="1" type="button">LEVEL 1</button>
@@ -69,7 +69,7 @@
         <div class="rule-banner"><span class="rule-icon">!</span><p><strong>今回のルール</strong><br>嘘をついているのは、必ずひとりだけ。ほかの人は本当のことを言っているよ。</p></div>
         <div id="statementList" class="statement-list"></div>
         <div class="answer-panel">
-          <div class="answer-heading"><span class="step-tag">YOUR TURN</span><h2>嘘つきはだれ？</h2><p>発言をよく読み、ひとり選ぼう。</p></div>
+          <div class="answer-heading"><span class="step-tag">YOUR TURN</span><h2>嘘つきはだれ？</h2><p><ruby>発言<rt>はつげん</rt></ruby>をよく<ruby>読<rt>よ</rt></ruby>み、ひとり<ruby>選<rt>えら</rt></ruby>ぼう。</p></div>
           <div id="answerOptions" class="answer-options"></div>
           <div class="answer-actions"><button id="hintButton" class="secondary-button" type="button">ヒントを見る</button><button id="checkButton" class="primary-button" type="button" disabled>答えを決める →</button></div>
           <div id="feedback" class="feedback hidden" role="status"></div>
