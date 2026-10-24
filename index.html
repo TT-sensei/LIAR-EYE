@@ -73,6 +73,13 @@
         <div class="answer-panel">
           <div class="answer-heading"><span class="step-tag">YOUR TURN</span><h2>犯人はだれ？</h2><p><ruby>発言<rt>はつげん</rt></ruby>をよく<ruby>読<rt>よ</rt></ruby>み、ひとり<ruby>選<rt>えら</rt></ruby>ぼう。</p></div>
           <div id="answerOptions" class="answer-options"></div>
+          <section class="scratchpad" aria-labelledby="scratchpadTitle">
+            <div class="scratchpad-heading">
+              <div><h3 id="scratchpadTitle">手書きメモ</h3><p>指やタッチペンで、自由に書きこもう。</p></div>
+              <button id="clearScratchpad" class="scratchpad-clear" type="button">消す</button>
+            </div>
+            <canvas id="scratchpadCanvas" aria-label="推理を書きこむ手書きメモ欄"></canvas>
+          </section>
           <div class="answer-actions"><button id="hintButton" class="secondary-button" type="button">ヒントを見る</button><button id="checkButton" class="primary-button" type="button" disabled>答えを決める →</button></div>
           <div id="feedback" class="feedback hidden" role="status"></div>
           <div id="hintBox" class="hint-box hidden"></div>
