@@ -15,8 +15,8 @@
     characterByPerson[person].id + "/fullbody/hint.webp";
   const personLabel = (person) =>
     characterByPerson[person].name + "（" + person + "）";
-  // kind: culprit は「その人が事件を起こした」、notCulprit は「その人は事件を起こしていない」。
-  // 犯人だけがうそをつく。全候補を検証して、答えが一つか確認する。
+  // kind: culprit / notCulprit は「その人が答えの行動をした／していない」。
+  // 今回の答えになる人だけがうそをつく。全候補を検証して、答えが一つか確認する。
   // 問題データは cases.js で管理し、ゲーム本体から分離する。
   const cases = window.LIAR_EYE_CASES || [];
 
@@ -265,8 +265,8 @@
         : statement.kind === "notCulprit"
           ? targetName + "は" + currentCase.action.negative + "。"
           : statement.kind === "outside"
-            ? targetName + "は事件のとき外にいたよ。"
-            : targetName + "は事件のとき教室にいたよ。";
+            ? targetName + "はこのとき教室の外にいたよ。"
+            : targetName + "はこのとき教室にいたよ。";
       const displayedLine = linesBySpeaker.get(statement.speaker) || actionText;
       setReadingText(text, "「" + displayedLine + "」");
       copy.append(name, text); card.append(portrait, copy); $("statementList").append(card);
@@ -295,7 +295,7 @@
     hintCount++;
     const box = $("hintBox"); box.classList.remove("hidden"); box.replaceChildren();
     const title = document.createElement("strong"); title.textContent = "ヒント " + hintCount;
-    const text = document.createElement("p"); setReadingText(text, hintCount === 1 ? currentCase.hint : "一人ずつ「この人が犯人」と仮定しよう。その人の発言だけがうそになり、ほかの人の発言は本当になるかな？");
+    const text = document.createElement("p"); setReadingText(text, hintCount === 1 ? currentCase.hint : "一人ずつ「この人が答え」と仮定しよう。その人の発言だけがうそになり、ほかの人の発言は本当になるかな？");
     box.append(title, text);
     if (hintCount >= 2) $("hintButton").disabled = true;
   }
@@ -310,9 +310,9 @@
     if (correct) correctCount++;
     completed.add(currentCase.id);
     const feedback = $("feedback"); feedback.className = "feedback " + (correct ? "correct" : "incorrect"); feedback.classList.remove("hidden");
-    feedback.textContent = correct ? "正解！ 証言をつなげて真相を見抜いたね。" : "今回はちがったね。事件の手がかりを解説で確かめよう。";
+    feedback.textContent = correct ? "正解！ 証言をつなげて真相を見抜いたね。" : "今回はちがったね。証言を解説で確かめよう。";
     const explanation = $("explanationBox"); explanation.classList.remove("hidden");
-    const heading = document.createElement("h3"); setReadingText(heading, "犯人：" + characterByPerson[answer[0]].name);
+    const heading = document.createElement("h3"); setReadingText(heading, "答え：" + characterByPerson[answer[0]].name);
     const text = document.createElement("p"); setReadingText(text, currentCase.explanation);
     explanation.append(heading, text);
     document.querySelectorAll(".answer-option").forEach(button => {
