@@ -77,14 +77,18 @@
   let currentCase = null, selected = null, hintCount = 0, answered = false;
   let activeFilter = "all", correctCount = 0, completed = new Set(), currentSequence = cases.slice();
 
-  function statementIsTrue(statement, culprit) {
-    return statement.kind === "culprit" ? statement.target === culprit : statement.target !== culprit;
+  function statementIsTrue(statement, culprit, item) {
+    if (statement.kind === "culprit") return statement.target === culprit;
+    if (statement.kind === "notCulprit") return statement.target !== culprit;
+    if (statement.kind === "outside") return item.whereabouts[statement.target] === "outside";
+    if (statement.kind === "inside") return item.whereabouts[statement.target] === "inside";
+    return false;
   }
   function solutions(item) {
     const result = [];
     item.statements.forEach((_, candidate) => {
       const valid = item.statements.every((statement, speakerIndex) => {
-        const truth = statementIsTrue(statement, item.statements[candidate].speaker);
+        const truth = statementIsTrue(statement, item.statements[candidate].speaker, item);
         return speakerIndex === candidate ? !truth : truth;
       });
       if (valid) result.push(item.statements[candidate].speaker);
@@ -156,7 +160,11 @@
       const targetName = characterByPerson[statement.target].name;
       const actionText = statement.kind === "culprit"
         ? targetName + "が" + currentCase.action.positive + "。"
-        : targetName + "は" + currentCase.action.negative + "。";
+        : statement.kind === "notCulprit"
+          ? targetName + "は" + currentCase.action.negative + "。"
+          : statement.kind === "outside"
+            ? targetName + "は外にいたよ。"
+            : targetName + "は教室にいたよ。";
       setReadingText(text, "「" + actionText + "」");
       copy.append(name, text); card.append(portrait, copy); $("statementList").append(card);
       const option = document.createElement("button"); option.type = "button"; option.className = "answer-option"; option.dataset.person = statement.speaker;
