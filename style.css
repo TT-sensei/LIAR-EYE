@@ -173,3 +173,42 @@ button:focus-visible{outline-color:#287eb5}
   html{scroll-behavior:auto}
   *,*::before,*::after{transition:none!important}
 }
+
+
+/* 問題文を主役にし、ルールは補助情報として控えめに */
+.puzzle-intro{
+  max-width:none;
+  margin:24px 0 18px;
+  padding:22px 24px;
+  color:#263f5e;
+  background:linear-gradient(135deg,#edf6ff 0%,#e5f1fc 100%);
+  border:1px solid #c8def3;
+  border-left:5px solid #6da6d8;
+  border-radius:14px;
+  box-shadow:0 7px 20px rgba(58,105,150,.07);
+  font-size:clamp(16px,1.5vw,18px);
+  line-height:2;
+  font-weight:600;
+}
+.rule-banner{
+  background:#f3f5f8;
+  border-color:#e2e7ee;
+  color:#68758a;
+  box-shadow:none;
+}
+.rule-icon{
+  background:#e0e7f0;
+  color:#60728a;
+}
+.rule-banner p,
+.rule-banner strong{color:#667489}
+.rule-banner strong{font-size:12px}
+@media(max-width:760px){
+  .puzzle-intro{
+    margin:20px 0 16px;
+    padding:18px 17px;
+    font-size:16px;
+    line-height:1.95;
+  }
+  .rule-banner{margin:16px 0 14px;padding:13px}
+}
