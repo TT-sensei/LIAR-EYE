@@ -43,7 +43,7 @@ for (const item of cases) {
     if (!item.cast?.[statement.speaker] || !item.cast?.[statement.target]) errors.push(`CASE ${item.id}: cast に話者または対象がいない`);
     if (["outside","inside"].includes(statement.kind) && !item.whereabouts?.[statement.target]) errors.push(`CASE ${item.id}: 居場所データがない (${statement.target})`);
   }
-  if (!item.action?.positive || !item.action?.negative || !item.question || !item.explanation) errors.push(`CASE ${item.id}: 問題・解説・action の必須項目が不足`);
+  if (!item.action?.positive || !item.action?.negative || !item.question || !item.explanation || !item.motive) errors.push(`CASE ${item.id}: 問題・解説・action・うその理由の必須項目が不足`);
   if (!item.intro?.trim() || !/[。！？]$/.test(item.intro.trim())) errors.push(`CASE ${item.id}: 導入文の句読点を確認`);
   if (answers.length === 1 && !item.explanation.includes(item.cast[answers[0]])) errors.push(`CASE ${item.id}: 解説に正解者名がない`);
 }
@@ -58,5 +58,5 @@ if (errors.length) {
   for (const error of errors) console.error(" - " + error);
   process.exitCode = 1;
 } else {
-  console.log("OK: 全問の一意解・話者データ・解説の基本整合性を確認しました。");
+  console.log("OK: 全問の一意解・話者データ・解説・うその理由を確認しました。");
 }
