@@ -72,20 +72,60 @@
     if (cursor < converted.length) element.append(document.createTextNode(converted.slice(cursor)));
   }
 
+  // CDN の辞書が利用できない環境でも、問題文の基本語にふりがなを付けるための予備辞書。
+  // 長い語から先に処理し、変換済みの ruby 内は再処理しない。
+  const fallbackReadings = [
+    ["放課後", "ほうかご"], ["教室", "きょうしつ"], ["最後", "さいご"],
+    ["持っている", "もっている"], ["持っていた", "もっていた"], ["持っていない", "もっていない"],
+    ["持っていなかった", "もっていなかった"], ["見当たらない", "みあたらない"],
+    ["見つけよう", "みつけよう"], ["比べて", "くらべて"], ["証言", "しょうげん"],
+    ["発言", "はつげん"], ["真相", "しんそう"], ["理由", "りゆう"],
+    ["一人", "ひとり"], ["二人", "ふたり"], ["三人", "さんにん"],
+    ["外", "そと"], ["中", "なか"], ["答え", "こたえ"], ["考える", "かんがえる"],
+    ["考えて", "かんがえて"], ["本当", "ほんとう"], ["仮定", "かてい"],
+    ["成り立たない", "なりたたない"], ["説明", "せつめい"], ["時間", "じかん"],
+    ["帰る", "かえる"], ["自分", "じぶん"], ["友だち", "ともだち"],
+    ["準備", "じゅんび"], ["隠して", "かくして"], ["隠した", "かくした"],
+    ["答えだ", "こたえだ"], ["答えは", "こたえは"], ["人の", "ひとの"]
+  ];
+  function appendFallbackFurigana(element, text) {
+    // HTML を組み立てず、テキストノードと ruby 要素だけを生成する。
+    let remaining = text;
+    element.replaceChildren();
+    while (remaining) {
+      let bestIndex = -1, bestWord = "", bestReading = "";
+      for (const [word, reading] of fallbackReadings) {
+        const index = remaining.indexOf(word);
+        if (index >= 0 && (bestIndex < 0 || index < bestIndex || (index === bestIndex && word.length > bestWord.length))) {
+          bestIndex = index; bestWord = word; bestReading = reading;
+        }
+      }
+      if (bestIndex < 0) { element.append(document.createTextNode(remaining)); break; }
+      if (bestIndex > 0) element.append(document.createTextNode(remaining.slice(0, bestIndex)));
+      const ruby = document.createElement("ruby");
+      ruby.append(document.createTextNode(bestWord));
+      const rt = document.createElement("rt"); rt.textContent = bestReading;
+      ruby.append(rt); element.append(ruby);
+      remaining = remaining.slice(bestIndex + bestWord.length);
+    }
+  }
+
   function setReadingText(element, value) {
     const text = String(value ?? "");
     const job = (rubyJobs.get(element) || 0) + 1;
     rubyJobs.set(element, job);
     element.textContent = text;
 
+    // まず予備辞書で即時表示。辞書 CDN が動けば、その後に文脈を見た読みへ置き換える。
+    appendFallbackFurigana(element, text);
     kuroshiroReady.then(async (instance) => {
       if (rubyJobs.get(element) !== job || !element.isConnected) return;
       const converted = await instance.convert(text, { mode: "furigana", to: "hiragana" });
       if (rubyJobs.get(element) !== job || !element.isConnected) return;
       appendKuroshiroFurigana(element, converted);
     }).catch((error) => {
-      // CDN や辞書に接続できない場合も、問題自体は読める状態にしておく。
-      console.warn("ふりがなの自動変換を利用できませんでした。", error);
+      // CDN や辞書に接続できなくても、予備辞書で付けたふりがなを残す。
+      console.warn("自動ふりがな辞書を利用できません。予備辞書で表示します。", error);
     });
   }
 
