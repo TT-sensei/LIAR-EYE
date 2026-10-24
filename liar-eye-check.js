@@ -29,7 +29,16 @@ for (const item of cases) {
   if (speakers.length !== lineSpeakers.length || speakers.some(s => !lineSpeakers.includes(s))) {
     errors.push(`CASE ${item.id}: statements と lines の話者が一致しない`);
   }
+  const lineBySpeaker = Object.fromEntries((item.lines || []).map(line => [line.speaker, line.text]));
   for (const statement of item.statements) {
+    const targetName = item.cast?.[statement.target];
+    const self = statement.speaker === statement.target;
+    let expectedLine = "";
+    if (statement.kind === "culprit") expectedLine = self ? `自分が${item.action.positive}。` : `${targetName}が${item.action.positive}。`;
+    if (statement.kind === "notCulprit") expectedLine = self ? `自分は${item.action.negative}。` : `${targetName}は${item.action.negative}。`;
+    if (statement.kind === "outside") expectedLine = self ? "自分は事件のとき外にいたよ。" : `${targetName}は事件のとき外にいたよ。`;
+    if (statement.kind === "inside") expectedLine = self ? "自分は事件のとき教室にいたよ。" : `${targetName}は事件のとき教室にいたよ。`;
+    if (lineBySpeaker[statement.speaker] !== expectedLine) errors.push(`CASE ${item.id}: ${statement.speaker} の表示文と判定データが不一致`);
     if (!["culprit","notCulprit","outside","inside"].includes(statement.kind)) errors.push(`CASE ${item.id}: 未対応の kind (${statement.kind})`);
     if (!item.cast?.[statement.speaker] || !item.cast?.[statement.target]) errors.push(`CASE ${item.id}: cast に話者または対象がいない`);
     if (["outside","inside"].includes(statement.kind) && !item.whereabouts?.[statement.target]) errors.push(`CASE ${item.id}: 居場所データがない (${statement.target})`);
