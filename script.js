@@ -199,6 +199,7 @@
     $("progressBar").style.width = (item.id / cases.length * 100) + "%";
     $("statementList").replaceChildren();
     $("answerOptions").replaceChildren();
+    const linesBySpeaker = new Map((item.lines || []).map(line => [line.speaker, line.text]));
     item.statements.forEach(statement => {
       const card = document.createElement("article"); card.className = "statement-card";
       const person = characterByPerson[statement.speaker];
@@ -220,9 +221,10 @@
         : statement.kind === "notCulprit"
           ? targetName + "は" + currentCase.action.negative + "。"
           : statement.kind === "outside"
-            ? targetName + "は外にいたよ。"
-            : targetName + "は教室にいたよ。";
-      setReadingText(text, "「" + actionText + "」");
+            ? targetName + "は事件のとき外にいたよ。"
+            : targetName + "は事件のとき教室にいたよ。";
+      const displayedLine = linesBySpeaker.get(statement.speaker) || actionText;
+      setReadingText(text, "「" + displayedLine + "」");
       copy.append(name, text); card.append(portrait, copy); $("statementList").append(card);
       const option = document.createElement("button"); option.type = "button"; option.className = "answer-option"; option.dataset.person = statement.speaker;
       const avatar = document.createElement("img"); avatar.className = "option-avatar";
