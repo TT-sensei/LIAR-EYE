@@ -33,7 +33,7 @@
   function setReadingText(element, value) {
     element.replaceChildren();
     const text = String(value ?? "");
-    const pattern = new RegExp(readingEntries.map(([word])=>word.replace(/[.*+?^${}()|[\]\\]/g,"\\  const $ = id => document.getElementById(id);")).join("|"),"g");
+    const pattern = new RegExp(readingEntries.map(([word]) => word).join("|"), "g");
     let cursor = 0, match;
     while ((match = pattern.exec(text)) !== null) {
       if (match.index > cursor) element.append(document.createTextNode(text.slice(cursor,match.index)));
