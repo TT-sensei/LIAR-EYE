@@ -34,7 +34,7 @@
 
   function appendKuroshiroFurigana(element, converted) {
     // mode:"furigana" の出力例：感(かん)じ取(と)れたら
-    const pattern = /([一-龯々]+)\\(([^()]+)\\)/g;
+    const pattern = /([一-龯々]+)\(([^()]+)\)/g;
     let cursor = 0, match;
     element.replaceChildren();
     while ((match = pattern.exec(converted)) !== null) {
