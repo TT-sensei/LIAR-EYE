@@ -1,6 +1,20 @@
 (() => {
   "use strict";
   const people = ["A", "B", "C", "D", "E", "F"];
+  // LIAR EYE の A〜F は、ナビキャラ6人に固定対応させる。
+  const characterByPerson = {
+    A: { id: "riku", name: "りく" },
+    B: { id: "sora", name: "そら" },
+    C: { id: "kai", name: "かい" },
+    D: { id: "saku", name: "さく" },
+    E: { id: "tsuki", name: "つき" },
+    F: { id: "nami", name: "なみ" }
+  };
+  const characterImage = (person) =>
+    "https://tt-sensei.github.io/navi-character-/assets/web/characters/" +
+    characterByPerson[person].id + "/fullbody/hint.webp";
+  const personLabel = (person) =>
+    characterByPerson[person].name + "（" + person + "）";
   // claim: "truth" means the target is honest; "liar" means the target is lying.
   // Every case is checked at runtime: exactly one assignment must satisfy the rules.
   const cases = [
@@ -135,16 +149,27 @@
     $("answerOptions").replaceChildren();
     item.statements.forEach(statement => {
       const card = document.createElement("article"); card.className = "statement-card";
-      const mark = document.createElement("span"); mark.className = "person-mark"; mark.textContent = statement.speaker;
-      const copy = document.createElement("div");
-      const name = document.createElement("p"); name.className = "statement-name"; name.textContent = statement.speaker + "さんの発言";
+      const person = characterByPerson[statement.speaker];
+      const portrait = document.createElement("img");
+      portrait.className = "character-portrait";
+      portrait.src = characterImage(statement.speaker);
+      portrait.alt = person.name;
+      portrait.loading = "lazy";
+      portrait.decoding = "async";
+      portrait.width = 64;
+      portrait.height = 76;
+      const copy = document.createElement("div"); copy.className = "statement-copy";
+      const name = document.createElement("p"); name.className = "statement-name";
+      setReadingText(name, person.name + "（" + statement.speaker + "）の発言");
       const text = document.createElement("p"); text.className = "statement-text";
-      setReadingText(text, "「" + statement.target + "さんは" + (statement.claim === "liar" ? "うそつき" : "正直者") + "だ。」");
-      copy.append(name, text); card.append(mark, copy); $("statementList").append(card);
+      const targetName = characterByPerson[statement.target].name + "（" + statement.target + "）";
+      setReadingText(text, "「" + targetName + "は" + (statement.claim === "liar" ? "うそつき" : "正直者") + "だ。」");
+      copy.append(name, text); card.append(portrait, copy); $("statementList").append(card);
       const option = document.createElement("button"); option.type = "button"; option.className = "answer-option"; option.dataset.person = statement.speaker;
-      const letter = document.createElement("span"); letter.className = "option-letter"; letter.textContent = statement.speaker;
-      const label = document.createElement("span"); label.textContent = statement.speaker + "さん";
-      option.append(letter, label); option.addEventListener("click", () => selectAnswer(statement.speaker));
+      const avatar = document.createElement("img"); avatar.className = "option-avatar";
+      avatar.src = characterImage(statement.speaker); avatar.alt = ""; avatar.loading = "lazy"; avatar.decoding = "async";
+      const label = document.createElement("span"); setReadingText(label, personLabel(statement.speaker));
+      option.append(avatar, label); option.addEventListener("click", () => selectAnswer(statement.speaker));
       $("answerOptions").append(option);
     });
     ["feedback","hintBox","explanationBox","nextActions"].forEach(id => { $(id).classList.add("hidden"); $(id).replaceChildren(); });
