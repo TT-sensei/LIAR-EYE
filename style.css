@@ -74,3 +74,10 @@ button:focus-visible,a:focus-visible{outline:3px solid #4f9cde;outline-offset:3p
   .answer-option{min-height:64px;gap:6px}
   .option-avatar{width:36px;height:42px}
 }
+
+
+/* スタート画面：ナビキャラのグループ画像 */
+.hero-art-characters{background:linear-gradient(145deg,#f7f1df 0%,#e8f2ef 100%);padding:18px;}
+.hero-art-characters .navi-character{display:block;width:100%;height:100%;max-height:350px;object-fit:contain;position:relative;z-index:1;}
+.hero-art-characters .label-top,.hero-art-characters .label-bottom{z-index:2;color:#536276;background:rgba(255,255,255,.78);padding:7px 10px;border-radius:6px;}
+@media(max-width:760px){.hero-art-characters{min-height:250px;padding:10px 16px 18px}.hero-art-characters .navi-character{max-height:270px}}
