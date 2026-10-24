@@ -48,6 +48,9 @@ for (const item of cases) {
   if (answers.length === 1 && !item.explanation.includes(item.cast[answers[0]])) errors.push(`CASE ${item.id}: 解説に正解者名がない`);
 }
 if (cases.length !== 30) errors.push(`問題数が30問ではない (${cases.length}問)`);
+for (const [person, count] of Object.entries(answerCounts)) {
+  if (count !== 5) errors.push(`正解者の分布: ${person} が ${count} 問 (5問が目標)`);
+}
 console.log(`検証した問題数: ${cases.length}`);
 console.log("正解者の分布:", answerCounts);
 if (errors.length) {
