@@ -47,7 +47,7 @@
   function applyReadingOverrides(converted) {
     let result = converted;
     for (const [word, reading] of readingOverrides) {
-      const escaped = word.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\  function appendKuroshiroFurigana(element, converted) {");
+      const escaped = word;
       result = result.replace(new RegExp(escaped + "\\\\([^()]*\\\\)", "g"), word + "(" + reading + ")");
     }
     return result;
