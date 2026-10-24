@@ -37,8 +37,25 @@
     return instance;
   })();
 
+  // 読みが揺れやすい語は、ふりがなだけを辞書で補正する。
+  const readingOverrides = new Map([
+    ["発言", "はつげん"], ["証言", "しょうげん"], ["矛盾", "むじゅん"],
+    ["論理的", "ろんりてき"], ["特定", "とくてい"], ["説明", "せつめい"],
+    ["真相", "しんそう"], ["教室", "きょうしつ"], ["時間割", "じかんわり"],
+    ["植木", "うえき"], ["配膳台", "はいぜんだい"]
+  ]);
+  function applyReadingOverrides(converted) {
+    let result = converted;
+    for (const [word, reading] of readingOverrides) {
+      const escaped = word.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\  function appendKuroshiroFurigana(element, converted) {");
+      result = result.replace(new RegExp(escaped + "\\\\([^()]*\\\\)", "g"), word + "(" + reading + ")");
+    }
+    return result;
+  }
+
   function appendKuroshiroFurigana(element, converted) {
     // mode:"furigana" の出力例：感(かん)じ取(と)れたら
+    converted = applyReadingOverrides(converted);
     const pattern = /([一-龯々]+)\(([^()]+)\)/g;
     let cursor = 0, match;
     element.replaceChildren();
@@ -107,7 +124,7 @@
         if (!node.isConnected || node.parentElement?.closest("ruby, rt, script, style, noscript")) return;
         const original = node.nodeValue;
         try {
-          const converted = await instance.convert(original, { mode: "furigana", to: "hiragana" });
+          const converted = applyReadingOverrides(await instance.convert(original, { mode: "furigana", to: "hiragana" }));
           if (node.isConnected && node.nodeValue === original) node.replaceWith(appendRubyFragment(converted));
         } catch (error) {
           // 読み変換に失敗した箇所は元の文章をそのまま残す。
@@ -219,11 +236,11 @@
       top.append(number, level);
       const title = document.createElement("h3"); title.className = "card-title"; setReadingText(title, item.title);
       const meta = document.createElement("div"); meta.className = "card-meta";
-      const detail = document.createElement("span"); detail.textContent = item.statements.length + "人の証言";
+      const detail = document.createElement("span"); setReadingText(detail, item.statements.length + "人の証言");
       const arrow = document.createElement("span"); arrow.className = "card-status";
       if (cleared.has(item.id)) { arrow.textContent = "✓ クリア"; arrow.setAttribute("aria-label", "クリア済み"); }
-      else if (completed.has(item.id)) { arrow.textContent = "再挑戦"; arrow.setAttribute("aria-label", "挑戦済み"); }
-      else { arrow.textContent = "挑戦する ↗"; }
+      else if (completed.has(item.id)) { setReadingText(arrow, "再挑戦"); arrow.setAttribute("aria-label", "挑戦済み"); }
+      else { setReadingText(arrow, "挑戦する ↗"); }
       meta.append(detail, arrow);
       card.append(top, title, meta);
       card.addEventListener("click", () => openCase(item));
@@ -313,7 +330,7 @@
     if (correct) correctCount++;
     completed.add(currentCase.id);
     const feedback = $("feedback"); feedback.className = "feedback " + (correct ? "correct" : "incorrect"); feedback.classList.remove("hidden");
-    feedback.textContent = correct ? "正解！ 証言をつなげて真相を見抜いたね。" : "今回はちがったね。証言を解説で確かめよう。";
+    setReadingText(feedback, correct ? "正解！ 証言をつなげて真相を見抜いたね。" : "今回はちがったね。証言を解説で確かめよう。");
     const explanation = $("explanationBox"); explanation.classList.remove("hidden");
     const heading = document.createElement("h3"); setReadingText(heading, "答え：" + characterByPerson[answer[0]].name);
     const text = document.createElement("p"); setReadingText(text, currentCase.explanation);
