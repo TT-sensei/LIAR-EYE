@@ -235,6 +235,8 @@
     $("checkButton").disabled = true;
     $("hintButton").disabled = false;
     showView("puzzle");
+    sizeScratchpad();
+    clearScratchpad();
   }
   function selectAnswer(person) {
     if (answered) return;
