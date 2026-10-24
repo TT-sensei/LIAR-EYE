@@ -119,7 +119,7 @@
   const $ = id => document.getElementById(id);
   const views = {home:$("homeView"), puzzle:$("puzzleView"), result:$("resultView")};
   let currentCase = null, selected = null, hintCount = 0, answered = false;
-  let activeFilter = "all", correctCount = 0, completed = new Set(), currentSequence = cases.slice();
+  let activeFilter = "all", correctCount = 0, completed = new Set(), cleared = new Set(), currentSequence = cases.slice();
 
   // タブレットの指・タッチペンで使える手書きメモ
   const scratchCanvas = $("scratchpadCanvas");
@@ -212,7 +212,7 @@
     filtered.forEach((item, index) => {
       const card = document.createElement("button");
       card.type = "button";
-      card.className = "question-card";
+      card.className = "question-card" + (cleared.has(item.id) ? " is-cleared" : completed.has(item.id) ? " is-attempted" : "");
       const top = document.createElement("div"); top.className = "card-top";
       const number = document.createElement("span"); number.className = "card-number"; number.textContent = "CASE " + String(item.id).padStart(2,"0");
       const level = document.createElement("span"); level.className = "level-pill level-" + item.level; level.textContent = "LEVEL " + item.level;
@@ -220,7 +220,7 @@
       const title = document.createElement("h3"); title.className = "card-title"; setReadingText(title, item.title);
       const meta = document.createElement("div"); meta.className = "card-meta";
       const detail = document.createElement("span"); detail.textContent = item.statements.length + "人の証言";
-      const arrow = document.createElement("span"); arrow.className = "card-arrow"; arrow.textContent = completed.has(item.id) ? "✓" : "↗";
+      const arrow = document.createElement("span"); arrow.className = "card-status";\n      if (cleared.has(item.id)) { arrow.textContent = "✓ クリア"; arrow.setAttribute("aria-label", "クリア済み"); }\n      else if (completed.has(item.id)) { arrow.textContent = "再挑戦"; arrow.setAttribute("aria-label", "挑戦済み"); }\n      else { arrow.textContent = "挑戦する ↗"; }
       meta.append(detail, arrow);
       card.append(top, title, meta);
       card.addEventListener("click", () => openCase(item));
@@ -349,7 +349,7 @@
   $("retryButton").addEventListener("click", () => openCase(currentCase));
   $("nextButton").addEventListener("click", goNext);
   $("reviewButton").addEventListener("click", () => { renderGrid(); showView("home"); });
-  $("restartButton").addEventListener("click", () => { correctCount = 0; completed = new Set(); renderGrid(); openCase(cases[0]); });
+  $("restartButton").addEventListener("click", () => { correctCount = 0; completed = new Set(); cleared = new Set(); renderGrid(); openCase(cases[0]); });
   document.querySelectorAll(".filter-chip").forEach(button => button.addEventListener("click", () => setFilter(button.dataset.filter)));
   assertPuzzleQuality();
   renderGrid();
