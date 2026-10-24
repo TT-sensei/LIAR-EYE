@@ -81,3 +81,15 @@ button:focus-visible,a:focus-visible{outline:3px solid #4f9cde;outline-offset:3p
 .hero-art-characters .navi-character{display:block;width:100%;height:100%;max-height:350px;object-fit:contain;position:relative;z-index:1;}
 .hero-art-characters .label-top,.hero-art-characters .label-bottom{z-index:2;color:#536276;background:rgba(255,255,255,.78);padding:7px 10px;border-radius:6px;}
 @media(max-width:760px){.hero-art-characters{min-height:250px;padding:10px 16px 18px}.hero-art-characters .navi-character{max-height:270px}}
+
+
+/* タブレットで考えを整理する手書きメモ */
+.scratchpad{margin:8px 0 24px;padding:16px;background:#f8f9fb;border:1px solid #dfe4ec;border-radius:14px}
+.scratchpad-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.scratchpad-heading h3{font-size:16px;margin:0 0 4px;color:var(--navy)}
+.scratchpad-heading p{font-size:12px;color:var(--muted);margin:0}
+.scratchpad-clear{min-height:40px;padding:0 15px;border:1px solid #d8dee8;border-radius:9px;background:white;color:#526077;font-weight:700;font-size:13px}
+.scratchpad-clear:active{background:#edf1f7}
+#scratchpadCanvas{display:block;width:100%;height:190px;background-color:#fff;border:1px solid #dce2eb;border-radius:9px;touch-action:none;cursor:crosshair;background-image:linear-gradient(#edf0f5 1px,transparent 1px);background-size:100% 28px}
+@media(min-width:700px){#scratchpadCanvas{height:220px}.scratchpad{padding:20px}}
+@media(max-width:440px){.scratchpad{padding:12px}.scratchpad-heading p{font-size:11px}#scratchpadCanvas{height:170px}}
