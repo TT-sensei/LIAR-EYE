@@ -16,36 +16,55 @@
     {id:10,level:3,title:"最後の見きわめ",intro:"最後は6人。自分自身についての発言にも注目して、すべての証言が成り立つか確かめよう。",hint:"Dさんがうそつきだとすると、Dさんの「Dは正直者」はどうなる？",explanation:"Dさんがうそつきなら、Dさんの「Dは正直者」はうそ。ほかの5人の発言は、Dさん以外について正直者だと言っているので、すべて本当になるよ。だから、うそつきはDさん一人だけ。",statements:[{speaker:"A",claim:"truth",target:"C"},{speaker:"B",claim:"truth",target:"E"},{speaker:"C",claim:"truth",target:"E"},{speaker:"D",claim:"truth",target:"D"},{speaker:"E",claim:"truth",target:"F"},{speaker:"F",claim:"truth",target:"F"}]}
   ];
 
-  // 小学生が読みやすいよう、よく使う漢字にふりがなを付ける
-  const readings = {
-    "読み比べ":"よみくらべ","正直者":"しょうじきもの","発言":"はつげん","矛盾":"むじゅん",
-    "証言":"しょうげん","条件":"じょうけん","確認":"かくにん","自分自身":"じぶんじしん",
-    "自分":"じぶん","発言内容":"はつげんないよう","内容":"ないよう","本当":"ほんとう",
-    "一人":"ひとり","一つずつ":"ひとつずつ","一人ずつ":"ひとりずつ","必ず":"かならず",
-    "全員":"ぜんいん","正解":"せいかい","解説":"かいせつ","考え方":"かんがえかた",
-    "発言どうし":"はつげんどうし","食いちがう":"くいちがう","仮定":"かてい",
-    "候補":"こうほ","最後":"さいご","推理":"すいり","挑戦":"ちょうせん",
-    "見抜":"みぬ","信じ":"しん","考":"かんが","確":"たし","話":"はな","人":"ひと",
-    "発言":"はつげん","正直":"しょうじき","嘘":"うそ","うそつき":"うそつき",
-    "証言":"しょうげん","最後":"さいご","自分":"じぶん","本当":"ほんとう"
-  };
-  const readingEntries = Object.entries(readings).sort((a,b)=>b[0].length-a[0].length);
-  function setReadingText(element, value) {
-    element.replaceChildren();
-    const text = String(value ?? "");
-    const pattern = new RegExp(readingEntries.map(([word]) => word).join("|"), "g");
+  // Kuroshiro + Kuromoji で、文章の文脈を見ながらふりがなを付ける。
+  // 辞書の読み込みが終わるまでは本文を表示し、準備ができたらルビに置き換える。
+  const rubyJobs = new WeakMap();
+  let kuroshiroInstance = null;
+  const kuroshiroReady = (async () => {
+    if (!window.Kuroshiro || !window.KuromojiAnalyzer) {
+      throw new Error("Kuroshiro または KuromojiAnalyzer を読み込めませんでした。");
+    }
+    const instance = new window.Kuroshiro();
+    await instance.init(new window.KuromojiAnalyzer({
+      dictPath: "https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/dict/"
+    }));
+    kuroshiroInstance = instance;
+    return instance;
+  })();
+
+  function appendKuroshiroFurigana(element, converted) {
+    // mode:"furigana" の出力例：感(かん)じ取(と)れたら
+    const pattern = /([一-龯々]+)\\(([^()]+)\\)/g;
     let cursor = 0, match;
-    while ((match = pattern.exec(text)) !== null) {
-      if (match.index > cursor) element.append(document.createTextNode(text.slice(cursor,match.index)));
+    element.replaceChildren();
+    while ((match = pattern.exec(converted)) !== null) {
+      if (match.index > cursor) element.append(document.createTextNode(converted.slice(cursor, match.index)));
       const ruby = document.createElement("ruby");
-      ruby.append(document.createTextNode(match[0]));
+      ruby.append(document.createTextNode(match[1]));
       const rt = document.createElement("rt");
-      rt.textContent = readings[match[0]];
+      rt.textContent = match[2];
       ruby.append(rt);
       element.append(ruby);
       cursor = match.index + match[0].length;
     }
-    if (cursor < text.length) element.append(document.createTextNode(text.slice(cursor)));
+    if (cursor < converted.length) element.append(document.createTextNode(converted.slice(cursor)));
+  }
+
+  function setReadingText(element, value) {
+    const text = String(value ?? "");
+    const job = (rubyJobs.get(element) || 0) + 1;
+    rubyJobs.set(element, job);
+    element.textContent = text;
+
+    kuroshiroReady.then(async (instance) => {
+      if (rubyJobs.get(element) !== job || !element.isConnected) return;
+      const converted = await instance.convert(text, { mode: "furigana", to: "hiragana" });
+      if (rubyJobs.get(element) !== job || !element.isConnected) return;
+      appendKuroshiroFurigana(element, converted);
+    }).catch((error) => {
+      // CDN や辞書に接続できない場合も、問題自体は読める状態にしておく。
+      console.warn("ふりがなの自動変換を利用できませんでした。", error);
+    });
   }
 
   const $ = id => document.getElementById(id);
