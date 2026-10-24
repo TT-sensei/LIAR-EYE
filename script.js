@@ -15,8 +15,8 @@
     characterByPerson[person].id + "/fullbody/hint.webp";
   const personLabel = (person) =>
     characterByPerson[person].name + "（" + person + "）";
-  // claim: "truth" means the target is honest; "liar" means the target is lying.
-  // Every case is checked at runtime: exactly one assignment must satisfy the rules.
+  // kind: culprit は「その人が事件を起こした」、notCulprit は「その人は事件を起こしていない」。
+  // 犯人だけがうそをつく。全候補を検証して、答えが一つか確認する。
   // 問題データは cases.js で管理し、ゲーム本体から分離する。
   const cases = window.LIAR_EYE_CASES || [];
 
@@ -77,8 +77,8 @@
   let currentCase = null, selected = null, hintCount = 0, answered = false;
   let activeFilter = "all", correctCount = 0, completed = new Set(), currentSequence = cases.slice();
 
-  function statementIsTrue(statement, liar) {
-    return statement.claim === "liar" ? statement.target === liar : statement.target !== liar;
+  function statementIsTrue(statement, culprit) {
+    return statement.kind === "culprit" ? statement.target === culprit : statement.target !== culprit;
   }
   function solutions(item) {
     const result = [];
@@ -153,8 +153,11 @@
       const name = document.createElement("p"); name.className = "statement-name";
       setReadingText(name, person.name + "（" + statement.speaker + "）の発言");
       const text = document.createElement("p"); text.className = "statement-text";
-      const targetName = characterByPerson[statement.target].name + "（" + statement.target + "）";
-      setReadingText(text, "「" + targetName + "は" + (statement.claim === "liar" ? "うそつき" : "正直者") + "だ。」");
+      const targetName = characterByPerson[statement.target].name;
+      const actionText = statement.kind === "culprit"
+        ? targetName + "が" + currentCase.action.positive + "。"
+        : targetName + "は" + currentCase.action.negative + "。";
+      setReadingText(text, "「" + actionText + "」");
       copy.append(name, text); card.append(portrait, copy); $("statementList").append(card);
       const option = document.createElement("button"); option.type = "button"; option.className = "answer-option"; option.dataset.person = statement.speaker;
       const avatar = document.createElement("img"); avatar.className = "option-avatar";
@@ -179,7 +182,7 @@
     hintCount++;
     const box = $("hintBox"); box.classList.remove("hidden"); box.replaceChildren();
     const title = document.createElement("strong"); title.textContent = "ヒント " + hintCount;
-    const text = document.createElement("p"); setReadingText(text, hintCount === 1 ? currentCase.hint : "一人ずつ「この人がうそつき」と仮定しよう。その人の発言だけがうそになり、ほかの全員の発言が本当になるかな？");
+    const text = document.createElement("p"); setReadingText(text, hintCount === 1 ? currentCase.hint : "一人ずつ「この人が犯人」と仮定しよう。その人の発言だけがうそになり、ほかの人の発言は本当になるかな？");
     box.append(title, text);
     if (hintCount >= 2) $("hintButton").disabled = true;
   }
@@ -194,9 +197,9 @@
     if (correct) correctCount++;
     completed.add(currentCase.id);
     const feedback = $("feedback"); feedback.className = "feedback " + (correct ? "correct" : "incorrect"); feedback.classList.remove("hidden");
-    feedback.textContent = correct ? "正解！ 矛盾を見抜いたね。" : "今回はちがったね。考え方を解説で確かめよう。";
+    feedback.textContent = correct ? "正解！ 証言をつなげて真相を見抜いたね。" : "今回はちがったね。事件の手がかりを解説で確かめよう。";
     const explanation = $("explanationBox"); explanation.classList.remove("hidden");
-    const heading = document.createElement("h3"); setReadingText(heading, "答え：" + answer[0] + "さん");
+    const heading = document.createElement("h3"); setReadingText(heading, "犯人：" + characterByPerson[answer[0]].name);
     const text = document.createElement("p"); setReadingText(text, currentCase.explanation);
     explanation.append(heading, text);
     document.querySelectorAll(".answer-option").forEach(button => {
