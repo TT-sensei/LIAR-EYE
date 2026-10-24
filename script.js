@@ -277,7 +277,6 @@
       portrait.height = 76;
       const copy = document.createElement("div"); copy.className = "statement-copy";
       const name = document.createElement("p"); name.className = "statement-name";
-      setReadingText(name, person.name + "（" + statement.speaker + "）の発言");
       const text = document.createElement("p"); text.className = "statement-text";
       const targetName = characterByPerson[statement.target].name;
       const actionText = statement.kind === "culprit"
@@ -288,14 +287,17 @@
             ? targetName + "はこのとき教室の外にいたよ。"
             : targetName + "はこのとき教室にいたよ。";
       const displayedLine = linesBySpeaker.get(statement.speaker) || actionText;
-      setReadingText(text, "「" + displayedLine + "」");
       copy.append(name, text); card.append(portrait, copy); $("statementList").append(card);
+      // 先にDOMへ追加してから変換し、接続前チェックで処理が飛ばされないようにする。
+      setReadingText(name, person.name + "（" + statement.speaker + "）の発言");
+      setReadingText(text, "「" + displayedLine + "」");
       const option = document.createElement("button"); option.type = "button"; option.className = "answer-option"; option.dataset.person = statement.speaker;
       const avatar = document.createElement("img"); avatar.className = "option-avatar";
       avatar.src = characterImage(statement.speaker); avatar.alt = ""; avatar.loading = "lazy"; avatar.decoding = "async";
-      const label = document.createElement("span"); setReadingText(label, personLabel(statement.speaker));
+      const label = document.createElement("span");
       option.append(avatar, label); option.addEventListener("click", () => selectAnswer(statement.speaker));
       $("answerOptions").append(option);
+      setReadingText(label, personLabel(statement.speaker));
     });
     ["feedback","hintBox","explanationBox","nextActions"].forEach(id => { $(id).classList.add("hidden"); $(id).replaceChildren(); });
     $("checkButton").disabled = true;
