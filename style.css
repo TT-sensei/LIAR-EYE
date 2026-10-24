@@ -54,3 +54,23 @@ button:focus-visible,a:focus-visible{outline:3px solid #4f9cde;outline-offset:3p
 @media(max-width:760px){.topbar{height:72px}.edition{display:none}.main-content{padding-top:24px}.hero{grid-template-columns:1fr}.hero-copy{padding:34px 28px 30px}.hero h1{font-size:44px}.hero-art{min-height:220px}.orbit{width:220px;height:220px}.orbit-two{width:160px;height:160px}.eye-mark{transform:rotate(45deg) scale(.76)}.mission-strip{grid-template-columns:auto 1fr;gap:14px 16px;padding:22px;margin-bottom:40px}.section-heading{align-items:start;flex-direction:column;gap:8px}.question-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.question-card{min-height:160px;padding:17px}.card-top{margin-bottom:16px}.puzzle-topline{margin-bottom:25px}.statement-list{grid-template-columns:1fr}.answer-options{grid-template-columns:repeat(2,minmax(0,1fr))}.answer-actions{flex-direction:column-reverse}.answer-actions button{width:100%}.next-actions{flex-direction:column}.next-actions button{width:100%}.footer{gap:12px;flex-wrap:wrap}}
 @media(max-width:440px){.brand strong{font-size:16px}.brand-eye{width:36px;height:36px}.quiet-button{font-size:12px}.question-grid{grid-template-columns:1fr}.question-card{min-height:140px}.hero h1{font-size:39px}.answer-options{grid-template-columns:1fr}.answer-option{min-height:54px}.puzzle-heading h1{font-size:30px}.case-stamp{width:58px;height:62px}.result-actions{flex-direction:column}.result-actions button{width:100%}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
+
+
+/* LIAR EYE: 6人のナビキャラを発言者・回答候補として表示 */
+.statement-card{align-items:center;gap:12px;min-width:0}
+.character-portrait{display:block;flex:0 0 64px;width:64px;height:76px;object-fit:contain;object-position:center bottom}
+.statement-copy{flex:1;min-width:0}
+.statement-name{font-size:13px;color:var(--navy);letter-spacing:.01em}
+.statement-text{overflow-wrap:anywhere}
+.answer-option{padding:8px;min-width:0;flex-wrap:wrap}
+.option-avatar{display:block;width:42px;height:46px;object-fit:contain;object-position:center bottom;flex:0 0 auto}
+.answer-option>span:last-child{overflow-wrap:anywhere}
+@media(max-width:620px){
+  .statement-list{grid-template-columns:1fr;gap:10px}
+  .statement-card{min-height:92px;padding:13px;gap:10px}
+  .character-portrait{flex-basis:54px;width:54px;height:66px}
+  .statement-text{font-size:14px}
+  .answer-options{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .answer-option{min-height:64px;gap:6px}
+  .option-avatar{width:36px;height:42px}
+}
