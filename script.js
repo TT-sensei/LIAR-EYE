@@ -72,6 +72,50 @@
     });
   }
 
+  // 固定表示の見出し・ボタンにもふりがなを付ける。既存の ruby と動的表示は二重変換しない。
+  function appendRubyFragment(converted) {
+    const fragment = document.createDocumentFragment();
+    const pattern = /([一-龯々]+)\(([^()]+)\)/g;
+    let cursor = 0, match;
+    while ((match = pattern.exec(converted)) !== null) {
+      if (match.index > cursor) fragment.append(document.createTextNode(converted.slice(cursor, match.index)));
+      const ruby = document.createElement("ruby");
+      ruby.append(document.createTextNode(match[1]));
+      const rt = document.createElement("rt");
+      rt.textContent = match[2];
+      ruby.append(rt);
+      fragment.append(ruby);
+      cursor = match.index + match[0].length;
+    }
+    if (cursor < converted.length) fragment.append(document.createTextNode(converted.slice(cursor)));
+    return fragment;
+  }
+
+  async function addRubyToStaticText(instance) {
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    while (walker.nextNode()) {
+      const node = walker.currentNode;
+      const parent = node.parentElement;
+      if (!parent || parent.closest("ruby, rt, script, style, noscript") ||
+          !/[一-龯々]/.test(node.nodeValue) || !node.nodeValue.trim()) continue;
+      nodes.push(node);
+    }
+    // 一度に少数ずつ処理し、画面表示を止めない。
+    for (let i = 0; i < nodes.length; i += 12) {
+      await Promise.all(nodes.slice(i, i + 12).map(async node => {
+        if (!node.isConnected || node.parentElement?.closest("ruby, rt, script, style, noscript")) return;
+        const original = node.nodeValue;
+        try {
+          const converted = await instance.convert(original, { mode: "furigana", to: "hiragana" });
+          if (node.isConnected && node.nodeValue === original) node.replaceWith(appendRubyFragment(converted));
+        } catch (error) {
+          // 読み変換に失敗した箇所は元の文章をそのまま残す。
+        }
+      }));
+    }
+  }
+
   const $ = id => document.getElementById(id);
   const views = {home:$("homeView"), puzzle:$("puzzleView"), result:$("resultView")};
   let currentCase = null, selected = null, hintCount = 0, answered = false;
@@ -307,4 +351,7 @@
   document.querySelectorAll(".filter-chip").forEach(button => button.addEventListener("click", () => setFilter(button.dataset.filter)));
   assertPuzzleQuality();
   renderGrid();
+  kuroshiroReady.then(addRubyToStaticText).catch(() => {
+    // 辞書を読み込めない環境でもゲームの操作・文章表示はそのまま使える。
+  });
 })();
