@@ -314,7 +314,9 @@
     const explanation = $("explanationBox"); explanation.classList.remove("hidden");
     const heading = document.createElement("h3"); setReadingText(heading, "答え：" + characterByPerson[answer[0]].name);
     const text = document.createElement("p"); setReadingText(text, currentCase.explanation);
-    explanation.append(heading, text);
+    const motiveHeading = document.createElement("h3"); setReadingText(motiveHeading, "なぜうそをついたの？");
+    const motive = document.createElement("p"); setReadingText(motive, characterByPerson[answer[0]].name + "は、" + (currentCase.motive || "ある理由から真相を隠そうとしていたんだ。"));
+    explanation.append(heading, text, motiveHeading, motive);
     document.querySelectorAll(".answer-option").forEach(button => {
       button.disabled = true;
       if (button.dataset.person === answer[0]) button.classList.add("is-correct");
