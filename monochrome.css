@@ -33,3 +33,11 @@ ruby{ruby-position:over}rt{font-size:.52em;font-weight:500;line-height:1;color:i
 .footer{border-color:#ddd;color:#666}
 @media(min-width:760px){.main-content{padding-top:38px}.statement-card{min-height:120px}.statement-text{font-size:19px}.answer-option{min-height:66px}}
 @media(max-width:760px){body{font-size:16px}.hero-description{font-size:16px}.statement-text{font-size:17px}.question-card{min-height:155px}}
+
+#statementList .statement-card .person-mark,
+#statementList .statement-card:nth-child(3n+2) .person-mark,
+#statementList .statement-card:nth-child(3n) .person-mark,
+#statementList .statement-card:nth-child(4n) .person-mark{background:#111;color:#fff;border:1px solid #111}
+#statementList .statement-card:nth-child(even) .person-mark{background:#eee;color:#111;border:1px solid #bbb}
+.answer-option.is-correct{background:#eee;border-color:#111;color:#111}
+.answer-option.is-wrong{background:#fff;border-color:#777;color:#111}
