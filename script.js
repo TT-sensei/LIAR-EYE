@@ -48,7 +48,7 @@
     let result = converted;
     for (const [word, reading] of readingOverrides) {
       const escaped = word;
-      result = result.replace(new RegExp(escaped + "\\\\([^()]*\\\\)", "g"), word + "(" + reading + ")");
+      result = result.replace(new RegExp(escaped + "\\([^()]*\\)", "g"), word + "(" + reading + ")");
     }
     return result;
   }
