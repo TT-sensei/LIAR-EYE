@@ -36,8 +36,9 @@ for (const item of cases) {
     let expectedLine = "";
     if (statement.kind === "culprit") expectedLine = self ? `自分が${item.action.positive}。` : `${targetName}が${item.action.positive}。`;
     if (statement.kind === "notCulprit") expectedLine = self ? `自分は${item.action.negative}。` : `${targetName}は${item.action.negative}。`;
-    if (statement.kind === "outside") expectedLine = self ? "自分はこのとき教室の外にいたよ。" : `${targetName}はこのとき教室の外にいたよ。`;
-    if (statement.kind === "inside") expectedLine = self ? "自分はこのとき教室にいたよ。" : `${targetName}はこのとき教室にいたよ。`;
+    const when = item.when || "このとき";
+    if (statement.kind === "outside") expectedLine = self ? "自分は" + when + "、教室の外にいたよ。" : targetName + "は" + when + "、教室の外にいたよ。";
+    if (statement.kind === "inside") expectedLine = self ? "自分は" + when + "、教室にいたよ。" : targetName + "は" + when + "、教室にいたよ。";
     if (lineBySpeaker[statement.speaker] !== expectedLine) errors.push(`CASE ${item.id}: ${statement.speaker} の表示文と判定データが不一致`);
     if (!["culprit","notCulprit","outside","inside"].includes(statement.kind)) errors.push(`CASE ${item.id}: 未対応の kind (${statement.kind})`);
     if (!item.cast?.[statement.speaker] || !item.cast?.[statement.target]) errors.push(`CASE ${item.id}: cast に話者または対象がいない`);
