@@ -220,7 +220,10 @@
       const title = document.createElement("h3"); title.className = "card-title"; setReadingText(title, item.title);
       const meta = document.createElement("div"); meta.className = "card-meta";
       const detail = document.createElement("span"); detail.textContent = item.statements.length + "人の証言";
-      const arrow = document.createElement("span"); arrow.className = "card-status";\n      if (cleared.has(item.id)) { arrow.textContent = "✓ クリア"; arrow.setAttribute("aria-label", "クリア済み"); }\n      else if (completed.has(item.id)) { arrow.textContent = "再挑戦"; arrow.setAttribute("aria-label", "挑戦済み"); }\n      else { arrow.textContent = "挑戦する ↗"; }
+      const arrow = document.createElement("span"); arrow.className = "card-status";
+      if (cleared.has(item.id)) { arrow.textContent = "✓ クリア"; arrow.setAttribute("aria-label", "クリア済み"); }
+      else if (completed.has(item.id)) { arrow.textContent = "再挑戦"; arrow.setAttribute("aria-label", "挑戦済み"); }
+      else { arrow.textContent = "挑戦する ↗"; }
       meta.append(detail, arrow);
       card.append(top, title, meta);
       card.addEventListener("click", () => openCase(item));
