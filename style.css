@@ -212,3 +212,37 @@ button:focus-visible{outline-color:#287eb5}
   }
   .rule-banner{margin:16px 0 14px;padding:13px}
 }
+
+
+/* 問題一覧：正解クリア済みのカードを色で見分けやすく */
+.card-status{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  padding:6px 10px;
+  border-radius:999px;
+  background:#edf1f6;
+  color:#65758b;
+  font-size:11px;
+  font-weight:800;
+  white-space:nowrap;
+}
+.question-card.is-cleared{
+  background:linear-gradient(145deg,#f0faf5 0%,#e4f5ec 100%);
+  border:1px solid #9ed9bd;
+  box-shadow:0 5px 18px rgba(49,137,94,.09);
+}
+.question-card.is-cleared .card-number{color:#438264}
+.question-card.is-cleared .card-title{color:#245b43}
+.question-card.is-cleared .card-status{
+  background:#27845b;
+  color:#fff;
+}
+.question-card.is-attempted:not(.is-cleared){
+  border-color:#d7c9a7;
+}
+.question-card.is-attempted:not(.is-cleared) .card-status{
+  background:#fff4d9;
+  color:#86682b;
+}
